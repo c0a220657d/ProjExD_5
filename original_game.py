@@ -107,8 +107,9 @@ class Player(pg.sprite.Sprite):
         self.bomb_power = 1  # 爆風の長さ
         self.hyper_life = 0  # 発動時間 
         self.hyper_count = 1 # 発動回数 
+        self.life = 3 # 残機
         self.font = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 30)
-        self.info = self.font.render(f"MAX:{self.bomb_max},POW:{self.bomb_power}", 0, "blue")
+        self.info = self.font.render(f"MAX:{self.bomb_max},POW:{self.bomb_power},LIFE:{self.life}", 0, "blue")
         self.img = pg.transform.rotozoom(pg.image.load(f"{MAIN_DIR}/fig/player.png"), 0, 0.5)
         self.rect = self.img.get_rect()
         self.rect.center = (self.x*SQ_SIDE,self.y*SQ_SIDE)
@@ -143,12 +144,14 @@ class Player(pg.sprite.Sprite):
                 self.x,self.y = P_1
             elif self.name == "p2":
                 self.x,self.y = P_2
+            self.life -= 1
+            self.hyper_life = 100
         screen.blit(self.img,self.rect.center)
-        self.info = self.font.render(f"MAX:{self.bomb_max},POW:{self.bomb_power}", 0, "blue")
+        self.info = self.font.render(f"MAX:{self.bomb_max},POW:{self.bomb_power},LIFE:{self.life}", 0, "blue")
         if self.name == "p1":
                 screen.blit(self.info,(60,0))
         elif self.name == "p2":
-                screen.blit(self.info,(800,640))
+                screen.blit(self.info,(700,640))
 
 
 class Item(pg.sprite.Sprite):
@@ -172,7 +175,8 @@ class Item(pg.sprite.Sprite):
         player:playerインスタンス
         """
         if self.type == "power_up":
-            player.bomb_power += 1
+            if player.bomb_power <= 6:
+                player.bomb_power += 1
         elif self.type == "hyper":
             player.hyper_life = 300
             player.invincible("hyper",screen)
@@ -244,10 +248,30 @@ class Explosion(pg.sprite.Sprite):
         screen.blit(self.img, self.rect.center)
 
 
+def result(pl,sc):
+    font = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 90)
+    if pl == "p1":
+        t = font.render(f"2P WIN", 0, "red")
+    else:
+        t = font.render(f"1P WIN", 0, "red")
+    text_rect = t.get_rect(center=(WIDTH//2, HEIGHT//2))
+    sc.blit(t,text_rect)
+
 def main():
     pg.display.set_caption("吹き飛べ！！こうかとん！！！")
     players = [Player(P_1,"p1"),Player(P_2,"p2")]
+    titles = pg.image.load(f"{MAIN_DIR}/fig/title_1.png")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
+    flg = 0
+    while flg < 1:
+        screen.blit(titles,(0,0))
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_RETURN:
+                    flg = 3
+        pg.display.update()
     bg_img = pg.image.load(f"{MAIN_DIR}/fig/pg_bg.jpg")
     wall_image = pg.transform.rotozoom(pg.image.load(f"{MAIN_DIR}/fig/wall.png"),0, 0.5)
     dwall_image = pg.transform.rotozoom(pg.image.load(f"{MAIN_DIR}/fig/damaged_wall.png"),0, 0.5)
@@ -355,6 +379,9 @@ def main():
                 i.get_item(player,screen)
         for item in items:
             item.update(screen)
+        for player in players:
+            if player.life <= 0:
+                result(player.name,screen)
         pg.display.update()
 
 
