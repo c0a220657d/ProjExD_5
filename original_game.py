@@ -247,12 +247,18 @@ class Explosion(pg.sprite.Sprite):
         screen.blit(self.img, self.rect.center)
 
 
-def result(pl,sc):
+def result(pl,sc,flg):
+    global t
     font = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 90)
-    if pl == "p1":
-        t = font.render(f"2P WIN", 0, "red")
-    else:
-        t = font.render(f"1P WIN", 0, "red")
+    if flg == 1:
+        finish_sound = pg.mixer.Sound(f"{MAIN_DIR}/fig/8bit-ME_Victory01.mp3")
+        finish_sound.play()
+        if pl == "p1":
+            t = font.render(f"2P WIN", 0, "red")
+        else:
+            t = font.render(f"1P WIN", 0, "red")
+    elif flg == 0:
+        t = font.render("", 0, "red")
     text_rect = t.get_rect(center=(WIDTH//2, HEIGHT//2))
     sc.blit(t,text_rect)
 
@@ -261,6 +267,8 @@ def main():
     players = [Player(P_1,"p1"),Player(P_2,"p2")]
     titles = pg.image.load(f"{MAIN_DIR}/fig/title_1.png")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
+    font = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 90)
+    t = font.render("", 0, "red")
     flg = 0
     while flg < 1:
         screen.blit(titles,(0,0))
@@ -382,10 +390,8 @@ def main():
         for player in players:
             if player.life <= 0:
                 w_l += 1
-                result(player.name,screen)
-        if w_l == 1:
-            finish_sound = pg.mixer.Sound(f"{MAIN_DIR}/fig/8bit-ME_Victory01.mp3")
-            finish_sound.play()
+                result(player.name,screen,w_l)
+        
         pg.display.update()
 
 
