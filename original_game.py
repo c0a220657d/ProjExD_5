@@ -16,6 +16,7 @@ TYPE_DICT = {0:"floor",1:"wall",2:"block",3:"bomb",4:"explosion"}
 P_1 = (3,14)  # 初期位置 
 P_2 = (22,3)
 
+# explosion_sound = pg.mixer.Sound(f"{MAIN_DIR}/fig/explosion.wav")
 
 def check_bound(obj,map_lst:list,mv):
     """
@@ -177,6 +178,8 @@ class Item(pg.sprite.Sprite):
             player.invincible("hyper",screen)
         elif self.type == "max_bomb":
             player.bomb_max += 1
+        power_up_sound = pg.mixer.Sound(f"{MAIN_DIR}/fig/power_up.wav")
+        power_up_sound.play()
         self.kill()
     
     def update(self,screen:pg.Surface):
@@ -211,6 +214,8 @@ class Bomb(pg.sprite.Sprite):
 
     def explode(self, screen: pg.Surface,map_lst:list):
         if self.timer >= 180: 
+            explosion_sound = pg.mixer.Sound(f"{MAIN_DIR}/fig/explosion.wav")
+            explosion_sound.play()
             return judgement(self,map_lst)
         return map_lst,[]
       
