@@ -16,7 +16,6 @@ TYPE_DICT = {0:"floor",1:"wall",2:"block",3:"bomb",4:"explosion"}
 P_1 = (3,14)  # 初期位置 
 P_2 = (22,3)
 
-# explosion_sound = pg.mixer.Sound(f"{MAIN_DIR}/fig/explosion.wav")
 
 def check_bound(obj,map_lst:list,mv):
     """
@@ -272,6 +271,7 @@ def main():
                 if event.key == pg.K_RETURN:
                     flg = 3
         pg.display.update()
+    w_l = 0
     bg_img = pg.image.load(f"{MAIN_DIR}/fig/pg_bg.jpg")
     wall_image = pg.transform.rotozoom(pg.image.load(f"{MAIN_DIR}/fig/wall.png"),0, 0.5)
     dwall_image = pg.transform.rotozoom(pg.image.load(f"{MAIN_DIR}/fig/damaged_wall.png"),0, 0.5)
@@ -381,7 +381,11 @@ def main():
             item.update(screen)
         for player in players:
             if player.life <= 0:
+                w_l += 1
                 result(player.name,screen)
+        if w_l == 1:
+            finish_sound = pg.mixer.Sound(f"{MAIN_DIR}/fig/8bit-ME_Victory01.mp3")
+            finish_sound.play()
         pg.display.update()
 
 
